@@ -1,0 +1,168 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc28:version{fb63b6ca-f435-4aa0-a2c7-c66ddc651dca} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "models\\wearable_glasses\\dmx\\mesh\\wearable_glasses.dmx"
+						import_scale = 1.0
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "GameDataList"
+				children = 
+				[
+					{
+						_class = "GenericGameData"
+						game_class = "prop_data"
+						game_keys = 
+						{
+							base = ""
+							allowstatic = false
+							bakelighting = true
+							damage_table = ""
+							"dmg.bullets" = -1.0
+							"dmg.club" = -1.0
+							"dmg.explosive" = -1.0
+							"dmg.fire" = -1.0
+							health = -1.0
+							spawn_motion_disabled = false
+						}
+					},
+					{
+						_class = "GenericGameData"
+						game_class = "vr_carry_type"
+						game_keys = 
+						{
+							carry_type = "0"
+						}
+					},
+					{
+						_class = "GenericGameData"
+						game_class = "hand_pose_pair"
+						game_keys = 
+						{
+							sequence = "grab"
+							pose_special_type = "0"
+							conform_fingers = false
+							allow_flip = false
+							parent_bone = ""
+							origin_left = [ 0.259038, 5.59838, 0.22018 ]
+							angles_left = [ -88.4234, 180.0, 180.0 ]
+							origin_right = [ 0.259038, -5.59838, 0.22018 ]
+							angles_right = [ -88.423409, 180.0, 180.0 ]
+							max_distance = 5.0
+							finger_thumb = 0.98
+							finger_pinky = 0.779
+							finger_ring = 0.727
+							finger_middle = 0.876
+							finger_index = 0.902
+							has_extent = false
+							show_extent_helper = false
+							extent_origin_left = [ 0.0, 0.0, 2.0 ]
+							extent_origin_min_left = [ 0.0, 0.0, -1.0 ]
+							extent_origin_right = [ 0.0, -0.0, 2.0 ]
+							extent_origin_min_right = [ 0.0, 0.0, 1.0 ]
+							has_rotation = false
+							rotation_axis0 = [ 0.0, 0.0, 10.0 ]
+							rotation_axis1 = [ 0.0, 0.0, -10.0 ]
+							rotation_min = 0.0
+							rotation_max = 0.0
+							pivot_min = 0.0
+							pivot_max = 0.0
+						}
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsHullFile"
+						name = "wearable_glasses"
+						disabled = true
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						filename = "models/wearable_glasses/dmx/mesh/wearable_glasses_separated.dmx"
+						import_scale = 1.0
+						faceMergeAngle = 16.040001
+						maxHullVertices = 64
+						import_mode = "HullPerMesh"
+						optimization_algorithm = "IFR"
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						origin = [ 0.237359, -0.058518, 1.141891 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						dimensions = [ 0.800902, 5.658852, 2.025028 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						origin = [ -2.174184, 2.953203, 1.432581 ]
+						angles = [ 1.035153, -96.213806, 9.421078 ]
+						dimensions = [ 0.503091, 4.660954, 0.587969 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						origin = [ -4.778074, 3.364699, 0.16789 ]
+						angles = [ 5.701735, -92.681946, 64.756386 ]
+						dimensions = [ 0.503091, 1.880862, 0.587969 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						origin = [ -2.174184, -2.697441, 1.911822 ]
+						angles = [ 0.845737, -89.754089, -2.252706 ]
+						dimensions = [ 0.503091, 4.660954, 0.587969 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "prop.plastic"
+						collision_prop = "default"
+						origin = [ -4.957604, -2.642684, 1.290794 ]
+						angles = [ 6.132209, -94.487244, 47.362461 ]
+						dimensions = [ 0.503091, 2.681077, 0.662956 ]
+					},
+				]
+			},
+		]
+		model_archetype = "physics_prop_model"
+		primary_associated_entity = "prop_physics"
+		anim_graph_name = ""
+	}
+}
