@@ -15,6 +15,7 @@ local CONTROLLER_TYPE_MODELS = {
     "models/wearable_glasses/wearable_glasses.vmdl",        -- 10
 }
 
+print("IsServer?", IsServer())
 if IsServer() then
     print("Is server, listening for player spawn...")
     -- Why does giving the function handle not work but anonymous function does?
@@ -58,13 +59,15 @@ function OnPlayerSpawn()
         },
         function(glass)
             print("New glasses name: "..glass:GetName())
+            glass:SetContextThink("act", glass:GetPrivateScriptScope()._Activate, 0)
             glass:SetContextThink("wearglasses", glass:GetPrivateScriptScope().WearGlasses, 0.2)
         end,
         nil)
         -----@diagnostic disable-next-line: undefined-field
         --glasses:SetThink(glasses:GetPrivateScriptScope().FirstTimeSetup, "FirstTimeSetup", 0.1)
     else
-        print("Glasses already exist nearby. lol")
+        print("Glasses already exist nearby...")
+        glasses:SetContextThink("act", glasses:GetPrivateScriptScope()._Activate, 0)
     end
 
     StopListeningToGameEvent(player_listener)

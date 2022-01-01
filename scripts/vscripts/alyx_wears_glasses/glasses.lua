@@ -160,8 +160,8 @@ local function isAllowedToDropGlasses()
     return context == 1 or context == nil
 end
 
-function Activate(activateType)
-    print("Glasses activate")
+function _Activate(activateType)
+    print("Glasses _activate")
     -- Listeners for glasses interaction
     game_event_listeners[1] = ListenToGameEvent("item_pickup", OnItemPickup, thisEntity)
     game_event_listeners[2] = ListenToGameEvent("item_released", OnItemReleased, thisEntity)
@@ -188,21 +188,14 @@ function Activate(activateType)
                 targetname = "2578210103_pp_glasses_blur",
                 origin = Vector(-112,64,40),
                 scale = 16,
-                model = "maps/glasses_meshes/entities/pp_blur_mesh_2.vmdl",--a_pp:GetModelName(),
+                model = "maps/glasses_meshes/entities/pp_blur_mesh_2.vmdl",
                 postprocessing = "materials/postprocessing/no_glasses.vpost",
                 fadetime = 0.1,
                 minexposure = 1,
                 maxexposure = 1,
-                --vscripts = "2578210103/pp_test",
             })
         end
-        --local pp_size = pp:GetBoundingMaxs()-pp:GetBoundingMins()
-        --print("starting size",pp_size)
-        --print( 128 / pp_size:Length() )
-        --print("scale",pp:GetModelScale())
-        --pp:SetModelScale( 128 / pp_size:Length() )
-        --print("scale",pp:GetModelScale())
-        --print("after size",pp:GetBoundingMaxs()-pp:GetBoundingMins())
+
         if pp:GetMoveParent() ~= player.handle then
             pp:SetParent(player.handle, "")
             pp:SetLocalOrigin(Vector(0,0,0))
@@ -211,6 +204,7 @@ function Activate(activateType)
         print("Created PP blur", pp, pp:GetModelName())
         if isWearingGlasses() then
             --DisableBlur()
+            WearGlasses()
         end
     end, "playerdelay", 0.12)
 end
@@ -224,14 +218,12 @@ function Precache(context)
         targetname = "2578210103_pp_glasses_blur",
         origin = Vector(-112,64,40),
         scale = 16,
-        model = "maps/glasses_meshes/entities/pp_blur_mesh_2.vmdl",--a_pp:GetModelName(),
+        model = "maps/glasses_meshes/entities/pp_blur_mesh_2.vmdl",
         postprocessing = "materials/postprocessing/no_glasses.vpost",
         fadetime = 0.1,
         minexposure = 1,
         maxexposure = 1,
-        --vscripts = "2578210103/pp_test",
     },context)
-    --PrecacheResource("model_folder","models/wearable_glasses", context)
 end
 
 function UpdateOnRemove()
@@ -244,10 +236,6 @@ end
 function FirstTimeSetup()
     print("First time glasses setup", thisEntity:GetName())
     UpdatePlayer()
-    --local player_is_wearing_glasses = player.handle:GetContext("player_is_wearing_glasses")
-    --if player_is_wearing_glasses then
-        --WearGlasses()
-    --end
 
     player_speaker = Entities:FindByClassname(nil, "point_player_speak")
     if not player_speaker then
@@ -256,12 +244,6 @@ function FirstTimeSetup()
 
     player.hmd:GetVRHand(0):SetEntityName("_plr_hl_prop_vr_hand_0")
     player.hmd:GetVRHand(1):SetEntityName("_plr_hl_prop_vr_hand_1")
-
-    --local e = Entities:First()
-    --while e do
-    --    print(e:GetName(), "\t\t\t\t", e:GetClassname())
-    --    e = Entities:Next(e)
-    --end
 
     local plr_name = thisEntity:GetName()
     for _, name in ipairs(COLLISION_ENTITIES) do
@@ -276,7 +258,6 @@ function FirstTimeSetup()
         end
     end
 
-    --playerSpeak("alyx_combat_relief", 0.5)
 end
 
 function EnableCollisions()
