@@ -1,5 +1,9 @@
 ---@diagnostic disable: lowercase-global
 
+-- This file attempt to fix hold pose when taking off glasses. Doesn't work.
+-- Maybe to do with hand position against face when grabbing in which case
+-- I don't know how to fix.
+
 --[[
     Glasses is prop_physics.
     Can send CallScriptFunction input to *alyx_glasses, e.g.
@@ -331,15 +335,20 @@ function WearGlasses()
     end
     player.looking_down = true
     -- glasses are invisible while on player
-    thisEntity:SetParent(player.hmd, "")
-    thisEntity:SetLocalOrigin(Vector(0,0,0))
-    thisEntity:SetLocalAngles(0,0,0)
-    thisEntity:SetRenderAlpha(0)
+    -- thisEntity:SetParent(player.hmd, "")
+    -- thisEntity:SetLocalOrigin(Vector(0,0,0))
+    -- thisEntity:SetLocalAngles(0,0,0)
+    -- thisEntity:SetAbsScale(0.01)
+    -- thisEntity:SetRenderAlpha(0)
+    -- thisEntity:SetOrigin(Vector(99999,99999,99999))
+    thisEntity:SetOrigin(Vector(0,0,0))
     thisEntity:StopThink("GlassesOnGroundThink")
     thisEntity:SetThink(GlassesThink, "PlayerThink", THINK_INTERVAL)
-    DisableCollisions()
+    -- DisableCollisions()
+    -- thisEntity:DisableMotion()
     DoEntFireByInstanceHandle(thisEntity, "DisablePhyscannonPickup", "", 0, nil, nil)
     DisableBlur()
+    debugoverlay:Sphere(thisEntity:GetOrigin(),5,255,0,0,255,true,20)
 end
 
 function DropTest()
@@ -351,7 +360,7 @@ end
 ---@param velocity? Vector
 ---@param angular_velocity? Vector
 function DropGlasses(direction, velocity, angular_velocity)
-    if not thisEntity:GetMoveParent() then return end
+    -- if not thisEntity:GetMoveParent() then return end
     if not isAllowedToDropGlasses() then
         print("Glasses tried to drop while dropping is disabled.")
         return
@@ -370,13 +379,19 @@ function DropGlasses(direction, velocity, angular_velocity)
     velocity = velocity or RandomInt(100, 200)
     angular_velocity = angular_velocity or RandomInt(90, 180)
     thisEntity:SetParent(nil, "")
+    thisEntity:SetOrigin(player.hmd:GetOrigin())
+    local a = player.hmd:GetAngles()
+    thisEntity:SetAngles(a.x,a.y,a.z)
     thisEntity:SetRenderAlpha(255)
+    thisEntity:SetAbsScale(1)
+    -- thisEntity:EnableMotion()
     thisEntity:ApplyAbsVelocityImpulse(direction * velocity)
     thisEntity:ApplyLocalAngularVelocityImpulse(Vector(angular_velocity,angular_velocity,angular_velocity))
     thisEntity:StopThink("PlayerThink")
     --debugoverlay:VertArrow(player.hmd:GetOrigin(), player.hmd:GetOrigin() + direction * 32, 2, 255, 0, 0, 255, false, 10)
     DoEntFireByInstanceHandle(thisEntity, "EnablePhyscannonPickup", "", 0, nil, nil)
     EnableBlur()
+    debugoverlay:Sphere(thisEntity:GetOrigin(),5,255,0,0,255,true,20)
 end
 
 function GlassesThink()
@@ -408,6 +423,16 @@ function GlassesThink()
         end
     end
     player.head_forward_cache = head_forward
+
+    -- Pickup off head test
+    for i = 0, 1 do
+        local hand = player.hmd:GetVRHand(i)
+        if player.handle:IsDigitalActionOnForHand(hand:GetLiteralHandType(), 3)
+        and VectorDistance(hand:GetOrigin(),player.hmd:GetOrigin()) < 32 then
+            TakeOffGlasses(i)
+            return
+        end
+    end
 
     -- Think interval
     return THINK_INTERVAL
@@ -443,6 +468,12 @@ local function GetHandIdFromTip(vr_tip_attachment)
     return handId
 end
 
+function TakeOffGlasses(hand)
+    print("Player took glasses off face.")
+    DropGlasses(Vector(0,0,0),0,0)
+    DoEntFireByInstanceHandle(thisEntity,"Use",tostring(hand),2,nil,nil)
+end
+
 function OnItemPickup(_, data)
     if not isAllowedToDropGlasses() then return end
     if data.item_name == thisEntity:GetName() then
@@ -452,10 +483,10 @@ function OnItemPickup(_, data)
             particle_hint = nil
         end
         is_being_held = true
-        if thisEntity:GetMoveParent() == player.hmd then
-            print("Player took glasses off face.")
-            DropGlasses(Vector(0,0,0),0,0)
-        end
+        -- if thisEntity:GetMoveParent() == player.hmd then
+        --     print("Player took glasses off face.")
+        --     DropGlasses(Vector(0,0,0),0,0)
+        -- end
     end
 end
 

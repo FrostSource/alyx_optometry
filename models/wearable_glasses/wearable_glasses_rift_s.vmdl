@@ -64,7 +64,7 @@
 							angles_left = [ -88.4234, 89.4675, -180.0 ]
 							origin_right = [ 3.22294, 0.606555, 0.162145 ]
 							angles_right = [ -88.423409, -89.46756, -179.999939 ]
-							max_distance = 5.0
+							max_distance = 70.0
 							finger_thumb = 0.98
 							finger_pinky = 0.779
 							finger_ring = 0.727
@@ -83,6 +83,17 @@
 							rotation_max = 0.0
 							pivot_min = 0.0
 							pivot_max = 0.0
+						}
+					},
+					{
+						_class = "GenericGameData"
+						game_class = "handpose_data"
+						game_keys = 
+						{
+							handpose_bone = ""
+							handpose_model = "models/props/max/handposes/handpose_grabpole.vmdl"
+							allow_procedural_handpose = false
+							global_pose_template = false
 						}
 					},
 				]
