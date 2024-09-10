@@ -25,20 +25,8 @@ if thisEntity then
     return
 end
 
---local DROP_FROM_FALLING_CHANCE = 0.4
-local DROP_FROM_DAMAGE_CHANCE = 0.25
-local DROP_FROM_LOOK_DOWN_CHANCE = 0.05
---local DROP_FROM_PROPER_JUMP_EXTRA_CHANCE = 0.3
-
--- 1 = any movement, 0 = 90 degrees
--- current method of calculating means it needs
--- to be a high number
+-- 1 = any movement, 0 = 90 degrees current method of calculating means it needs to be a high number
 local HEAD_TWITCH_ANGLE = 0.9
--- disabled until a better method because quick turn
--- will consistently trigger this
-local DROP_FROM_HEAD_TWITCH_CHANCE = 0--0.3
-
-local DROP_FROM_BARNACLE_GRAB_CHANCE = 0.6
 
 -- minimum damage player just recieve to drop glasses
 -- for reference: grunt on story does 2, on hard 11
@@ -47,24 +35,16 @@ local MIN_DAMAGE_TO_DROP = 1
 -- multiplier will be calculated based on jump height betwen these two values
 local MIN_JUMP_HEIGHT_TO_DROP = 32
 local MAX_JUMP_HEIGHT_TO_DROP = 176 -- roughly death height
--- will then be multiplied by this for final chance, this is essentially the max chance
-local DROP_FROM_JUMP_DOWN_CHANCE = 0.5
+
 -- multiplier will be calculated based on jump distance betwen these two values
 local MIN_JUMP_FORWARD_TO_DROP = 100 -- just over the running sound dist
 local MAX_JUMP_FORWARD_TO_DROP = 180 -- usually max jump dist
--- will then be multiplied by this for final chance, this is essentially the max chance
-local DROP_FROM_JUMP_FORWARD_CHANCE = 0.02
 
 local PROPER_JUMP_MULTIPLIER = 1.5
 -- if player did an actual jump then we make sure there's never a 0% chance
 local PROPER_JUMP_MIN_CHANCE = 0.1
 
 local SKILL = Convars:GetInt("skill")
-
--- seconds before particle and sound hint start after dropping glasses
-local HINT_POSITION_DELAY = 5 + (10 * SKILL)
-
-local UP_BIAS = 0.8
 
 EasyConvars:RegisterConvar("glasses_wear_distance", 4, "Distance at which glasses will always be worn when released")
 EasyConvars:SetPersistent("glasses_wear_distance", true)
@@ -86,12 +66,15 @@ EasyConvars:SetPersistent("glasses_drop_from_look_down_chance", true)
 EasyConvars:RegisterConvar("glasses_drop_from_barnacle_grab_chance", 0.6)
 EasyConvars:SetPersistent("glasses_drop_from_barnacle_grab_chance", true)
 
+-- disabled until a better method because quick turn will consistently trigger this
 EasyConvars:RegisterConvar("glasses_drop_from_head_twitch_chance", 0.0)
 EasyConvars:SetPersistent("glasses_drop_from_head_twitch_chance", true)
 
+-- Jump forward chance will be multiplied by this for final chance, this is essentially the max chance
 EasyConvars:RegisterConvar("glasses_drop_from_jump_forward_chance", 0.02)
 EasyConvars:SetPersistent("glasses_drop_from_jump_forward_chance", true)
 
+-- Jump down will be multiplied by this for final chance, this is essentially the max chance
 EasyConvars:RegisterConvar("glasses_drop_from_jump_down_chance", 0.5)
 EasyConvars:SetPersistent("glasses_drop_from_jump_down_chance", true)
 
@@ -107,7 +90,6 @@ EasyConvars:SetPersistent("glasses_use_hint_particle", true)
 EasyConvars:RegisterConvar("glasses_hint_delay", function ()
     -- Initializer
     SKILL = Convars:GetInt("skill")
-    print(5 + (10 * SKILL))
     return 5 + (10 * SKILL)
 end)
 EasyConvars:SetPersistent("glasses_hint_delay", true)
@@ -166,10 +148,6 @@ local PP_TABLE = {
 local playerIsHeldByBarnacle = false
 local teleportStartedFlag = false
 local playerDidProperJump = false
-local isBeingHeld = false
--- local glassesWereDroppedUnintentionally = false
----Player is putting glasses on manually by dropping onto head
-local playerPuttingGlassesOn = false
 ---ID of particle
 local particleHint = -1
 -- used to get around event firing on grab AND release
@@ -198,9 +176,6 @@ local function randomHeadForward(max_angle)
     local yaw = RandomInt(-max_angle, max_angle)
     local pitch = RandomInt(-max_angle, max_angle)
     local dir = RotatePosition(Vector(0,0,0), QAngle(pitch, 0, yaw), playerHeadForward())
-    --local bias = (1 - RemapVal(dir.z, -1, 1, 0, 1)) --* UP_BIAS
-    --print("BIAS", bias)
-    --dir = RotatePosition(Vector(0,0,0), QAngle(-180*bias,0,0), dir)
     return dir
 end
 
@@ -226,11 +201,8 @@ local base = entity("GlassesProp")
 base.glassesWereDroppedUnintentionally = false
 
 function base:Precache(context)
-    -- print("PRECACHE")
-    -- PrecacheModel("maps/glasses_meshes/entities/pp_blur_mesh_2.vmdl", context)
     PrecacheModel("models/wearable_glasses/wearable_glasses.vmdl", context)
     PrecacheModel("models/wearable_glasses/wearable_glasses_rift_s.vmdl", context)
-    -- PrecacheModel("models/brushes/postprocess_blur_hull.vmdl", context)
 
     for i = 0, 3 do
         PP_TABLE.postprocessing = "materials/postprocessing/no_glasses_"..i..".vpost"
@@ -246,16 +218,10 @@ end
 ---Called automatically on player activate.
 ---@param readyType OnReadyType
 function base:OnReady(readyType)
-    --local a_pp = Entities:FindByClassname(nil, "post_processing_volume")
-    -- Uses existing postprocess model to work!
-    --if not a_pp then
-    --    error("Map must have at least one post_processing_volume!")
-    --end
+    devprint("Glasses OnReady")
 
-    -- FirstTimeSetup()
-    print("Glasses OnReady")
     ---@TODO Find a better method for waiting for player while integrating with OnReady
-    self:Delay(function ()
+    -- self:Delay(function ()
 
 
         playerPreviousPos = Player:GetOrigin()
@@ -264,20 +230,7 @@ function base:OnReady(readyType)
 
         self:SetBlurAmount()
 
-        -- local pp = Entities:FindByName(nil, "2578210103_pp_glasses_blur")
-        -- if not pp then
-        --     pp = SpawnEntityFromTableSynchronous(PP_TABLE.class,PP_TABLE)
-        -- end
-
-        -- if pp:GetMoveParent() ~= Player then
-        --     pp:SetParent(Player, "")
-        --     pp:SetLocalOrigin(Vector(0,0,0))
-        --     pp:SetLocalAngles(0,0,0)
-        -- end
-        -- devprints("Created PP blur", pp, pp:GetModelName())
-
         if self:IsWearingGlasses() then
-            --DisableBlur()
             self:WearGlasses()
         end
 
@@ -285,7 +238,7 @@ function base:OnReady(readyType)
         if not playerSpeaker then
             playerSpeaker = SpawnEntityFromTableSynchronous("point_player_speak",{})
         end
-    end)
+    -- end)
 end
 
 ---Set the amount of blur post processing shown when glasses are taken off.
@@ -316,7 +269,6 @@ function base:SetBlurAmount(amount)
 end
 
 function base:IsWearingGlasses()
-    -- return self:GetMoveParent() == Player.HMDAvatar
     return self:GetOwner() == Player
 end
 
@@ -326,34 +278,31 @@ function base:IsAllowedToDropGlasses()
 end
 
 function base:EnableBlur()
-    devprints("Enable blur", Entities:FindByName(nil, POSTPROCESS_BLUR_NAME))
+    devprints("Glasses enable blur", Entities:FindByName(nil, POSTPROCESS_BLUR_NAME))
     DoEntFire(POSTPROCESS_BLUR_NAME, "Enable", "", 0, nil, nil)
 end
 function base:DisableBlur()
-    devprints("Disable blur", Entities:FindByName(nil, POSTPROCESS_BLUR_NAME))
+    devprints("Glasses disable blur", Entities:FindByName(nil, POSTPROCESS_BLUR_NAME))
     DoEntFire(POSTPROCESS_BLUR_NAME, "Disable", "", 0, nil, nil)
 end
 
 function base:EnableDrop()
     self:EntFire("EnablePickup")
     self.isAllowedToDropGlasses = true
-    devprints("Disabled drop")
+    devprints("Glasses disabled drop")
 end
 function base:DisableDrop()
     self:EntFire("DisablePickup")
     self.isAllowedToDropGlasses = false
-    devprints("Enabled drop")
+    devprints("Glasses enabled drop")
 end
 
 ---Instantly wears the glasses.
 ---@param silent? boolean # if true, no attach or relief sound will play
 function base:WearGlasses(silent)
-    -- stops the chance of glasses instantly falling off when put on
     devprint("Putting glasses on")
 
-    -- if playerPuttingGlassesOn then
     if not silent then
-        -- playerPuttingGlassesOn = false
         randomSound(ATTACH_SOUNDS)
         if self.glassesWereDroppedUnintentionally then
             self.glassesWereDroppedUnintentionally = false
@@ -365,8 +314,6 @@ function base:WearGlasses(silent)
     playerIsLookingDown = true
 
     self:SetGlassesOnHead(true)
-    -- self:StopThink("GlassesOnGroundThink")
-    -- self:SetThink(GlassesThink, "PlayerThink", THINK_INTERVAL)
     self:ResumeThink()
 end
 
@@ -376,7 +323,6 @@ end
 ---@param angularVelocity? number
 ---@param silent? boolean # if true, no drop sounds will play
 function base:DropGlasses(direction, velocity, angularVelocity, silent)
-    -- if not self:GetMoveParent() then return end
     if not self:IsWearingGlasses() then return end
     if not self:IsAllowedToDropGlasses() then
         warn("Glasses tried to drop while dropping is disabled.")
@@ -392,7 +338,6 @@ function base:DropGlasses(direction, velocity, angularVelocity, silent)
         playerSpeak("alyx_startled", 0)
         devprint("GlASSES DROPPED!")
         self:ResumeThink()
-        -- self:SetThink(GlassesOnGroundThink, "GlassesOnGroundThink", HINT_POSITION_DELAY)
     end
 
     self:SetGlassesOnHead(false)
@@ -403,8 +348,6 @@ function base:DropGlasses(direction, velocity, angularVelocity, silent)
 
     self:ApplyAbsVelocityImpulse(direction * velocity)
     self:ApplyLocalAngularVelocityImpulse(Vector(angularVelocity,angularVelocity,angularVelocity))
-    -- self:StopThink("PlayerThink")
-    --debugoverlay:VertArrow(player.hmd:GetOrigin(), player.hmd:GetOrigin() + direction * 32, 2, 255, 0, 0, 255, false, 10)
     glassesDropTime = Time()
 end
 
@@ -415,31 +358,17 @@ function base:SetGlassesOnHead(onHead)
         self:SetParent(Player.HMDAvatar or Player, "")
         self:SetLocalOrigin(Vector(0,0,0))
         self:SetLocalAngles(0,0,0)
-        -- self:SetRenderAlpha(0)
-        -- DisableCollisions()
         self:EntFire("DisablePhyscannonPickup")
         self:DisableBlur()
         self:SetOwner(Player)
     else
         self:SetRenderingEnabled(true)
         self:SetParent(nil, "")
-        -- self:SetRenderAlpha(255)
         self:EntFire("EnablePhyscannonPickup")
-        -- DoEntFireByInstanceHandle(self, "EnablePhyscannonPickup", "", 0, nil, nil)
         self:EnableBlur()
         self:SetOwner(nil)
     end
 end
-
--- function base:GlassesOnGroundThink()
---     self:CatchFallThroughWorld()
-
---     self:EmitSoundParams("AlyxGlasses.NotifyPosition", 0, 4, 0)
---     if particleHint == nil then
---         particleHint = ParticleManager:CreateParticle("particles/instanced/vort_menacea/shot6/grabbity_gloves_glow_c_instance1.vpcf", 1, self)
---     end
---     return 3
--- end
 
 ---Check if glasses are too far below player, and if so put back on player (assume have fallen through world)
 function base:CatchFallThroughWorld()
@@ -457,7 +386,6 @@ base:PlayerEvent("item_pickup", function (self, params)
     ---@cast self GlassesProp
 
     if grabFix then
-        print('grab fix pickip')
         grabFix = false
         return
     end
@@ -473,17 +401,13 @@ base:PlayerEvent("item_pickup", function (self, params)
 
     if params.item_name == self:GetName() then
         self:EndHint()
-        isBeingHeld = true
         if self:GetMoveParent() == Player.HMDAvatar then
             devprint("Player took glasses off face")
-            -- self:DropGlasses(Vector(0,0,0),0,0)
             self:SetGlassesOnHead(false)
             self:SetOrigin(params.hand:GetOrigin())
             grabFix = true
             self:Drop()
-            -- self:Delay(function()
-                self:Grab(params.hand)
-            -- end, 0.1)
+            self:Grab(params.hand)
         end
     end
 end)
@@ -505,19 +429,15 @@ base:PlayerEvent("item_released", function (self, params)
     ---@cast self GlassesProp
 
     if grabFix then
-        print('grab fix release')
         return
     end
 
-    -- if not self:IsAllowedToDropGlasses() then return end
     if params.item_name == self:GetName() then
-        isBeingHeld = false
         devprints("Player trying to put glasses on", self:GetForwardVector():Dot(playerHeadForward()), VectorDistance(self:GetOrigin(), Player:EyePosition()))
         local dist = VectorDistance(self:GetOrigin(), Player:EyePosition())
         if dist <= EasyConvars:GetFloat("glasses_wear_distance")
             or (dist < EasyConvars:GetFloat("glasses_accurate_wear_distance") and self:GetForwardVector():Dot(playerHeadForward()) > 0.4)
         then
-            -- playerPuttingGlassesOn = true
             self:WearGlasses()
         end
     end
@@ -534,22 +454,18 @@ function base:Think()
             local playerFacingZ = head_forward.z
             if not playerIsLookingDown and playerFacingZ < -0.8 then
                 playerIsLookingDown = true
-                -- print("Player looked down.")
-                printChance(EasyConvars:GetFloat("glasses_drop_from_look_down_chance"))
+                -- printChance(EasyConvars:GetFloat("glasses_drop_from_look_down_chance"))
                 if randomChance(EasyConvars:GetFloat("glasses_drop_from_look_down_chance")) then
                     devprint("Dropped glasses from looking down")
                     self.glassesWereDroppedUnintentionally = true
                     self:DropGlasses(head_forward, 50, 0)
-                    --return 1
                 end
             elseif playerFacingZ > -0.3 then
                 playerIsLookingDown = false
             end
 
             -- Determine if player moved head quickly
-            --print(head_forward:Dot(player.head_forward_cache))
             if head_forward:Dot(playerPreviousHeadForward) < HEAD_TWITCH_ANGLE then
-                --print("HEAD TWITCHED", head_forward:Dot(player.head_forward_cache))
                 if randomChance(EasyConvars:GetFloat("glasses_drop_from_head_twitch_chance")) then
                     devprint("Dropped glasses from shaking head")
                     self.glassesWereDroppedUnintentionally = true
@@ -566,7 +482,6 @@ function base:Think()
         if self.glassesWereDroppedUnintentionally and Time() - glassesDropTime > EasyConvars:GetFloat("glasses_hint_delay") then
             self:ShowHint()
             glassesDropTime = Time()
-            print("HINT", Time() - glassesDropTime, EasyConvars:GetFloat("glasses_hint_delay"))
         end
     end
 
@@ -608,7 +523,7 @@ base:GameEvent("player_teleport_start", function(self, params)
     --data.positionY
     --data.positionZ
     --data.map_name
-    -- print("GameEvent: PlayerTeleportStart")
+
     teleportStartedFlag = true
     local playerPos = Player:GetOrigin()
     playerPreviousPos = Vector(playerPos.x, playerPos.y, playerPos.z)
@@ -619,6 +534,7 @@ end)
 ---@param params GAME_EVENT_PLAYER_TELEPORT_FINISH
 base:GameEvent("player_teleport_finish", function (self, params)
     ---@cast self GlassesProp
+
     --data.userid
     --data.positionX
     --data.positionY
@@ -627,8 +543,8 @@ base:GameEvent("player_teleport_finish", function (self, params)
 
     -- since this fires for continuous we only want to calculate if its preceeded by a tp start
     if not teleportStartedFlag or not self:IsWearingGlasses() then return end
+
     teleportStartedFlag = false
-    -- print("GameEvent: PlayerTeleportFinish")
     local playerPos = Player:GetOrigin()
     -- Calculate distance
     local jumpDistance = VectorDistance(
@@ -637,6 +553,7 @@ base:GameEvent("player_teleport_finish", function (self, params)
     )
     local jumpForwardChance = RemapValClamped(jumpDistance, MIN_JUMP_FORWARD_TO_DROP, MAX_JUMP_FORWARD_TO_DROP, 0, 1)
     jumpForwardChance = jumpForwardChance * EasyConvars:GetFloat("glasses_drop_from_jump_forward_chance")
+
     -- Calculate height
     -- abs in case player jumps up
     local jumpHeight = abs(playerPos.z - playerPreviousPos.z)
@@ -645,18 +562,11 @@ base:GameEvent("player_teleport_finish", function (self, params)
 
     -- Should combine the chances or choose the max?
     local finalChance = max(jumpForwardChance, jumpDownChance)
-    devprint(jumpForwardChance, jumpDownChance)
     if playerDidProperJump then
         finalChance = max(finalChance * PROPER_JUMP_MULTIPLIER, PROPER_JUMP_MIN_CHANCE)
         playerDidProperJump = false
-        --print("was proper jump")
     end
 
-    --analytic_max_jump_distance = max(analytic_max_jump_distance, jump_distance)
-    --analytic_max_jump_height = max(analytic_max_jump_height, jump_height)
-    --print("distance: "..jump_distance, "max: "..analytic_max_jump_distance)
-    --print("height: "..jump_height, "max: "..analytic_max_jump_height)
-    printChance(finalChance)
     if randomChance(finalChance) then
         devprint("Dropped glasses from movement")
         self.glassesWereDroppedUnintentionally = true
@@ -670,8 +580,7 @@ end)
 ---@param params GAME_EVENT_PLAYER_CONTINUOUS_JUMP_FINISH
 base:GameEvent("player_continuous_jump_finish", function (self, params)
     ---@cast self GlassesProp
-    --data.userid
-    -- print("GameEvent: PlayerContinousJumpFinish")
+
     playerDidProperJump = true
 end)
 
@@ -679,23 +588,20 @@ end)
 ---@param params GAME_EVENT_PLAYER_HURT
 base:GameEvent("player_hurt", function (self, params)
     ---@cast self GlassesProp
-    --data.userid
-    --data.attacker
-    --data.health # remaining hp
 
     -- Don't have a chance to drop glasses if they didn't fall off the first time player was grabbed by barnacle.
     if not self:IsWearingGlasses() or playerIsHeldByBarnacle then return end
 
     local hp_lost = playerPreviousHealth - params.health
-    -- print("GameEvent: PlayerHurt", data.health, hp_lost)
     if hp_lost >= MIN_DAMAGE_TO_DROP then
         local mult = 1 + (hp_lost / Player:GetMaxHealth())
         local final_chance = EasyConvars:GetFloat("glasses_drop_from_damage_chance") * mult
+
+        ---@TODO Double check that this works, it's old code
         if hp_lost >= Convars:GetInt("sk_headcrab_melee_dmg") then
-            -- print("Headcrab attached to face!")
             final_chance = 1
         end
-        printChance(final_chance)
+
         if randomChance(final_chance) then
             devprints("Dropped glasses from damage", hp_lost)
             self.glassesWereDroppedUnintentionally = true
@@ -703,35 +609,27 @@ base:GameEvent("player_hurt", function (self, params)
         end
     end
     playerPreviousHealth = params.health
-    -- -- debug infinite health
-    -- player.handle:SetHealth(player.handle:GetMaxHealth())
-    -- player.hp_cache = player.handle:GetHealth()
 end)
-
--- did 7, max 100, chance 52%, default chance 25%
 
 ---Player grabbed by barnacle event.
 ---@param params GAME_EVENT_PLAYER_GRABBED_BY_BARNACLE
 base:GameEvent("player_grabbed_by_barnacle", function (self, params)
     ---@cast self GlassesProp
-    --data.userid
+
     if playerWasGrabbedByBarnacle then
-        --print("","!!!!!!!!!!!PLAYER WAS RELEASED!!!!!!!!")
         playerWasGrabbedByBarnacle = false
         return
     end
 
     playerWasGrabbedByBarnacle = true
+
     if not self:IsWearingGlasses() then return end
-    -- print("GameEvent: PlayerGrabbedByBarnacle")
-    --print("","!!!!!!!!!!!PLAYER WAS GRABBED!!!!!!!!")
+
     playerIsHeldByBarnacle = true
-    printChance(EasyConvars:GetFloat("glasses_drop_from_barnacle_grab_chance"))
+
     if randomChance(EasyConvars:GetFloat("glasses_drop_from_barnacle_grab_chance")) then
         devprint("Dropped glasses from barnacle")
         self.glassesWereDroppedUnintentionally = true
-        --local dir = randomHeadForward(45)
-        --dir.z = RandomFloat(0.8, 1)
         local dir = Vector(RandomFloat(-1,1),RandomFloat(-1,1),RandomFloat(0.8, 1))
         self:DropGlasses(dir, RandomInt(100,200), RandomInt(10,200))
     end

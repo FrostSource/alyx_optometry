@@ -8,7 +8,6 @@ if IsServer() then
     require("alyx_optometry.classes.glasses")
 
     -- execute code or load mod libraries here
-    --2578210103
 
     -- maps to GetVRControllerType()
     local CONTROLLER_TYPE_MODELS = {
@@ -31,8 +30,6 @@ if IsServer() then
     AlyxGlasses = nil
 
     EasyConvars:RegisterCommand("glasses_drop", function ()
-        -- DoEntFire(GLASSES_NAME, "RunScriptCode", "DropGlasses()", 0, nil, nil)
-        -- local glasses = Entities:FindByName(nil, GLASSES_NAME)--[[@as GlassesProp]]
         if not AlyxGlasses then
             warn("Glasses prop could not be found!")
             return
@@ -43,8 +40,6 @@ if IsServer() then
     end, "Drops the glasses")
 
     EasyConvars:RegisterCommand("glasses_wear", function ()
-        -- DoEntFire(GLASSES_NAME, "RunScriptCode", "WearGlasses()", 0, nil, nil)
-        -- local glasses = Entities:FindByName(nil, GLASSES_NAME)--[[@as GlassesProp]]
         if not AlyxGlasses then
             warn("Glasses prop could not be found!")
             return
@@ -53,25 +48,20 @@ if IsServer() then
         AlyxGlasses:WearGlasses()
     end, "Puts the glasses on", 0)
 
-    -- print("Is server, listening for player spawn...")
-    -- Why does giving the function handle not work but anonymous function does?
-    -- player_listener = ListenToGameEvent("player_activate", function() OnPlayerSpawn() end, nil)
-    --ListenToGameEvent("player_activate", function() print("activate", Entities:GetLocalPlayer()) end, nil)
-
     ListenToPlayerEvent("player_activate", function (params)
         Player:Delay(function()
             -- Search range should include nearby if player lost glasses when transitioning
             -- so we don't spawn another pair on player face.
             local glasses_count = #Entities:FindAllByName(GLASSES_NAME)
             if glasses_count > 0 then
-                print("Glasses do exist in map...")
+                devprint("Glasses do exist in map...")
             end
-            print("Looking for existing glasses near player...")
+
+            devprint("Looking for existing glasses near player...")
             local glasses = Entities:FindByNameNearest(GLASSES_NAME, Player:GetOrigin(), 400)
             if not glasses then
-                print("No glasses nearby, spawning new glasses...")
+                devprint("No glasses nearby, spawning new glasses...")
                 local model = CONTROLLER_TYPE_MODELS[Player:GetVRControllerType()]
-                print("CONTROLLER TYPE",Player:GetVRControllerType())
                 SpawnEntityFromTableAsynchronous("prop_physics",{
                     --targetname = "2578210103_alyx_glasses",
                     --origin = Vector(0,5,5),
@@ -89,19 +79,14 @@ if IsServer() then
                 },
                 function(newGlasses)
                     ---@cast newGlasses GlassesProp
-                    print("New glasses name: "..newGlasses:GetName())
-                    -- glasses:SetContextThink("act", glasses:GetPrivateScriptScope()._Activate, 0)
-                    -- glasses:SetContextThink("wearglasses", glasses:GetPrivateScriptScope().WearGlasses, 0.2)
+                    devprint("New glasses name: "..newGlasses:GetName())
                     newGlasses:WearGlasses(true)
                     AlyxGlasses = newGlasses
                 end,
                 nil)
-                -----@diagnostic disable-next-line: undefined-field
-                --glasses:SetThink(glasses:GetPrivateScriptScope().FirstTimeSetup, "FirstTimeSetup", 0.1)
             else
-                print("Glasses already exist nearby...")
+                devprint("Glasses already exist nearby...")
                 AlyxGlasses = glasses
-                -- glasses:SetContextThink("act", glasses:GetPrivateScriptScope()._Activate, 0)
             end
         end)
 
