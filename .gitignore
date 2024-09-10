@@ -1,5 +1,6 @@
 
 /_bakeresourcecache/
 *bakeresourcecache.vpk
-__*
-/.vscode/
+__pycache__
+__test*
+*.bak

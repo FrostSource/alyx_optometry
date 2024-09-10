@@ -52,7 +52,7 @@
 				m_flBloomStartValue = 1.0
 				m_flBlurWeight = 
 				[
-					0.0, 0.483, 0.8864, 0.8125,
+					0.0, 0.0, 0.2985, 0.5522,
 					0.8125,
 				]
 				m_vBlurTint = 
