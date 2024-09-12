@@ -1,2 +1,2 @@
--- this is test workshop file
+-- Test workshop addon.
 require("alyx_optometry.init")
