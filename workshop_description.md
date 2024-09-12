@@ -2,13 +2,17 @@
 
 Experience the unseen inconvenience of Gordon's combat as Alyx deals with her macular degeneration by donning a hastily constructed pair of glasses.
 
+[i]This addon require AlyxLib to work.[/i]
+
+[h2]How To Use[/h2]
+
 This addon should work in any map including workshop maps.
 
 You will start with glasses on your face when the map is loaded. They can be taken off by hand or knocked off by movement and interaction with the world. They can be put back on by dropping them on your face just like the face mask.
 
 The amount of vision blur is dependent on your difficulty setting by default. You can change the amount at any time using the console commands below.
 
-If the the glasses cannot be found after certain time they will emit a beeping sound and glow to aid your search.
+If the dropped glasses cannot be found after certain amount of time they will emit a beeping sound and glow to aid your search.
 
 [h2]Console Commands[/h2]
 
@@ -108,3 +112,9 @@ Holstering can be buggy when the head is mismatched from the real life body (loo
 If a map allows the player to have the same custom weapon in more than one weapon slot, holstering both might cause issues.
 
 [b]body_holsters_require_trigger_to_unholster[/b] will cause rapidfire weapons to shoot if the trigger is held too long after unholstering.
+
+[h2]Getting Help[/h2]
+
+Please feel free to reach out either by commenting below or messaging me on the Discord server!
+
+[url=https://discord.gg/42SC3Wyjv4][img]https://steamuserimages-a.akamaihd.net/ugc/2397692528302959470/036A75FE4B2E8CD2224F8B62E7CEBEE649493C40/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img][/url]
