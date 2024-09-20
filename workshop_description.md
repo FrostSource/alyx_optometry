@@ -27,6 +27,9 @@ Forces the glasses to drop off the player head.
 [*][b]glasses_wear[/b]
 Forces the glasses to be worn on the player head.
 
+[*][b]glasses_show_hint[/b]
+Forces the glasses to display a hint to their location.
+
 [*][b]glasses_blur_amount[/b]
 Default = (Depends on difficulty)
 Must be a value of 0, 1, 2, or 3. Sets the amount of blur shown when the glasses are not worn, with 0 being the smallest amount and 3 being the biggest amount.
