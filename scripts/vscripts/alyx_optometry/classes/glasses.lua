@@ -53,7 +53,7 @@ EasyConvars:SetPersistent("glasses_accurate_wear_distance", true)
 
 EasyConvars:RegisterCommand("glasses_show_hint", function ()
     if not AlyxGlasses then
-        warn("Glasses prop could not be found!")
+        EasyConvars:Warn("Glasses prop could not be found!")
         return
     end
 
@@ -101,13 +101,12 @@ EasyConvars:RegisterConvar("glasses_blur_amount", function ()
 end, "", 0, function (newVal, oldVal)
     local val = tonumber(newVal)
     if val ~= 0 and val ~= 1 and val ~= 2 and val ~= 3 then
-        Msg("Blur amount must be 0, 1, 2 or 3!\n")
-        EasyConvars:SetRaw("glasses_blur_amount", oldVal)
-        return
+        EasyConvars:Msg("Blur amount must be 0, 1, 2 or 3!")
+        return oldVal
     end
 
     if not AlyxGlasses then
-        warn("Glasses prop could not be found!")
+        EasyConvars:Warn("Glasses prop could not be found!")
         return
     end
 

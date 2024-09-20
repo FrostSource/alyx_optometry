@@ -31,7 +31,7 @@ if IsServer() then
 
     EasyConvars:RegisterCommand("glasses_drop", function ()
         if not AlyxGlasses then
-            warn("Glasses prop could not be found!")
+            EasyConvars:Warn("Glasses prop could not be found!")
             return
         end
 
@@ -41,7 +41,7 @@ if IsServer() then
 
     EasyConvars:RegisterCommand("glasses_wear", function ()
         if not AlyxGlasses then
-            warn("Glasses prop could not be found!")
+            EasyConvars:Warn("Glasses prop could not be found!")
             return
         end
 
