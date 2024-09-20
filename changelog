@@ -1,0 +1,24 @@
+Update 3:
+
+Update to new AlyxLib standards.
+
+Update 2:
+
+This addon has been completely overhauled to use the new AlyxLib scripting system. It requires the AlyxLib addon to be downloaded and enabled.
+
+Fixed weird grab pose that sometimes occurred when taking glasses off face (hopefully).
+
+Fixed "invalid storage" message that sometimes appeared when putting glasses on.
+
+Added console variable to change blur amount, no longer dependent on difficulty.
+
+Added console variables for drop chances, no longer dependent on difficulty.
+
+Added console variables for dropped glasses hints.
+
+
+The transition to the new AlyxLib API is a complex update so please bear with me during this time. I do this as a hobby and cannot always dedicate my time to fixes.
+
+Update 1:
+
+Amount of vision blur is based on difficulty.
