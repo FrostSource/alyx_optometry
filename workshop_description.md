@@ -16,6 +16,8 @@ If the dropped glasses cannot be found after certain amount of time they will em
 
 [h2]Console Commands[/h2]
 
+Console commands allow you to customize and tweak the addon while playing. They are not required to use the addon, and for most users the default values will provide a good experience. 
+
 If you don't know how to use the console, follow this guide: https://steamcommunity.com/sharedfiles/filedetails/?id=2040205272
 
 [hr][/hr]
@@ -98,23 +100,11 @@ They can also be added to your [b]Half-Life Alyx\game\hlvr\cfg\skill.cfg[/b] fil
 
 [h2]Source Code[/h2]
 
-GitHub: https://github.com/FrostSource/body_holsters
+GitHub: https://github.com/FrostSource/alyx_optometry
 
 [h2]Known Issues[/h2]
 
-Ammo displays on visible holstered weapons will show incorrect amount of ammo. Unfortunately I have not found a way to get the current ammo inside a weapon.
-
-Trying to grab a weapon near the face while wearing a mask or respirator will cause the player to accidentally remove the worn item instead of the weapon. Unfortunately I have not found a way to get around this.
-
-Due to the way Half-Life: Alyx works, the multitool will fail to function correctly if equipped by some means other than the weapon selection menu. The multitool is not allowed to be holstered by default for this reason.
-
-Maps without a backpack will function incorrectly.
-
-Holstering can be buggy when the head is mismatched from the real life body (looking sideways while facing forwards). There is no easy way to track where the body is relative to the head.
-
-If a map allows the player to have the same custom weapon in more than one weapon slot, holstering both might cause issues.
-
-[b]body_holsters_require_trigger_to_unholster[/b] will cause rapidfire weapons to shoot if the trigger is held too long after unholstering.
+Physically grabbing a ladder while wearing the glasses will cause the screen to turn orange.
 
 [h2]Getting Help[/h2]
 
