@@ -380,7 +380,7 @@ end
 local grabFix = false
 
 ---Glasses are picked up
----@param params PLAYER_EVENT_ITEM_PICKUP
+---@param params PlayerEventItemPickup
 base:PlayerEvent("item_pickup", function (self, params)
     ---@cast self GlassesProp
 
@@ -412,7 +412,7 @@ base:PlayerEvent("item_pickup", function (self, params)
 end)
 
 ---Attempt to stop the invalid storage message pop up when throwing glasses onto face
----@param params GAME_EVENT_PLAYER_ATTEMPTED_INVALID_STORAGE
+---@param params GameEventPlayerAttemptedInvalidStorage
 base:GameEvent("player_attempted_invalid_storage", function (self, params)
     ---@cast self GlassesProp
 
@@ -423,7 +423,7 @@ base:GameEvent("player_attempted_invalid_storage", function (self, params)
     end
 end)
 
----@param params GAME_EVENT_ITEM_RELEASED
+---@param params PlayerEventItemReleased
 base:PlayerEvent("item_released", function (self, params)
     ---@cast self GlassesProp
 
@@ -496,7 +496,7 @@ function base:ShowHint()
 
     if EasyConvars:GetBool("glasses_use_hint_particle") then
         if particleHint == -1 then
-            particleHint = ParticleManager:CreateParticle("particles/instanced/vort_menacea/shot6/grabbity_gloves_glow_c_instance1.vpcf", 1, self)
+            particleHint = ParticleManager:CreateParticle("particles/instanced/vort_menacea/shot6/grabbity_gloves_glow_c_instance1.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
         end
     end
 end
@@ -513,7 +513,7 @@ end
 ---Player teleport start game event.
 ---This fires when player releases thumbstick and starts teleport.
 ---Position is where teleport marker is, not player.
----@param params GAME_EVENT_PLAYER_TELEPORT_START
+---@param params GameEventPlayerTeleportStart
 base:GameEvent("player_teleport_start", function(self, params)
     ---@cast self GlassesProp
 
@@ -530,7 +530,7 @@ end)
 
 ---Player teleport finish event.
 ---This fires when player finishes teleport or moves with continuous.
----@param params GAME_EVENT_PLAYER_TELEPORT_FINISH
+---@param params GameEventPlayerTeleportFinish
 base:GameEvent("player_teleport_finish", function (self, params)
     ---@cast self GlassesProp
 
@@ -576,7 +576,7 @@ end)
 ---Player continuous jump event.
 ---This fires when player jumps across a gap or down a large height.
 ---This isn't consistently registered so should be used as an extra chance.
----@param params GAME_EVENT_PLAYER_CONTINUOUS_JUMP_FINISH
+---@param params GameEventPlayerContinuousJumpFinish
 base:GameEvent("player_continuous_jump_finish", function (self, params)
     ---@cast self GlassesProp
 
@@ -584,7 +584,7 @@ base:GameEvent("player_continuous_jump_finish", function (self, params)
 end)
 
 ---Player hurt game event.
----@param params GAME_EVENT_PLAYER_HURT
+---@param params GameEventPlayerHurt
 base:GameEvent("player_hurt", function (self, params)
     ---@cast self GlassesProp
 
@@ -611,7 +611,7 @@ base:GameEvent("player_hurt", function (self, params)
 end)
 
 ---Player grabbed by barnacle event.
----@param params GAME_EVENT_PLAYER_GRABBED_BY_BARNACLE
+---@param params GameEventPlayerGrabbedByBarnacle
 base:GameEvent("player_grabbed_by_barnacle", function (self, params)
     ---@cast self GlassesProp
 
